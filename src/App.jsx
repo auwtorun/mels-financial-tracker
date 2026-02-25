@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Wallet, Plus } from 'lucide-react';
-import Dashboard from './components/Dashboard';
-import TransactionForm from './components/TransactionForm';
-import TransactionList from './components/TransactionList';
-import CategoryChart from './components/CategoryChart';
+import React, { useState } from "react";
+import { Wallet, Plus } from "lucide-react";
+import Dashboard from "./components/Dashboard";
+import TransactionForm from "./components/TransactionForm";
+import TransactionList from "./components/TransactionList";
+import CategoryChart from "./components/CategoryChart";
+import { Button } from "./components/ui/button";
 
 function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -14,29 +15,47 @@ function App() {
       <header className="bg-white shadow-sm sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
-            <Wallet className="text-blue-500" size={32} />
-            <h1 className="text-2xl font-bold text-gray-900">
-              Financial Tracker
+            <h1 className="text-xl font-sans font-bold text-gray-900">
+              Mels Personal Financial Tracker
             </h1>
           </div>
         </div>
       </header>
+      {/*
+      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
 
-      {/* Main Content */}
+        <Dashboard />
+
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <div className="lg:col-span-1">
+            <CategoryChart />
+          </div>
+
+
+          <div className="lg:col-span-2">
+            <TransactionList />
+          </div>
+        </div>
+      </main>
+
+      */}
+
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Dashboard Cards */}
         <Dashboard />
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-4">
           {/* Left Column - Chart */}
           <div className="lg:col-span-1">
-            <CategoryChart />
+            <TransactionList />
           </div>
 
           {/* Right Column - Transaction List */}
           <div className="lg:col-span-2">
-            <TransactionList />
+            <CategoryChart />
           </div>
         </div>
       </main>
@@ -51,13 +70,16 @@ function App() {
       </button>
 
       {/* Transaction Form Drawer */}
-      <TransactionForm isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      <TransactionForm
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+      />
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
+      <footer className="bg-white border-t border-gray-200 mt-12 absolute w-full">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-gray-600 text-sm">
-            Data disimpan secara lokal di browser kamu 🔒
+            Datanya tersedia offline kok sayang:)
           </p>
         </div>
       </footer>
