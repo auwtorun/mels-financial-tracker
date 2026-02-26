@@ -48,7 +48,7 @@ const Dashboard = () => {
                 </p>
               </div>
               <div className={`${stat.color} p-3 rounded-full`}>
-                <Icon className="text-white" size={24} />
+                <Icon className="text-white transform scale-y-[-1]" size={24} />
               </div>
             </div>
           </div>

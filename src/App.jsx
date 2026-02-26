@@ -50,7 +50,7 @@ function App() {
         <div className="flex flex-col gap-4">
           {/* Left Column - Chart */}
           <div className="lg:col-span-1">
-            <TransactionList />
+            <TransactionList limit={5} showViewAll={true}/>
           </div>
 
           {/* Right Column - Transaction List */}

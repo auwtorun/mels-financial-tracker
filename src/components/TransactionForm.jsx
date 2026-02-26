@@ -148,7 +148,7 @@ const TransactionForm = ({ isOpen, onClose }) => {
 
     addTransaction({
       ...formData,
-      amount: parseFloat(formData.amount),
+      amount: parseFloat(formData.amount), // Sudah dalam format number tanpa titik
       date: formData.date.toISOString(),
     });
 
@@ -164,6 +164,13 @@ const TransactionForm = ({ isOpen, onClose }) => {
     onClose();
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
   const availableCategories = categories.filter(
     (cat) => cat.type === formData.type || cat.type === 'both',
   );
@@ -174,13 +181,30 @@ const TransactionForm = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  const formatRupiahInput = (value) => {
+    // Hapus semua karakter non-digit
+    const numbers = value.replace(/\D/g, '');
+
+    // Format dengan titik setiap 3 digit
+    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  const handleAmountChange = (e) => {
+    const input = e.target.value;
+    const formatted = formatRupiahInput(input);
+
+    // Simpan nilai asli (tanpa titik) untuk calculation
+    const rawValue = formatted.replace(/\./g, '');
+
+    setFormData({ ...formData, amount: rawValue });
+  };
+
   return (
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ${
-          isOpen ? 'opacity-50' : 'opacity-0'
-        }`}
+        className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ${isOpen ? 'opacity-50' : 'opacity-0'
+          }`}
         onClick={onClose}
         style={{
           pointerEvents: isOpen ? 'auto' : 'none',
@@ -233,11 +257,10 @@ const TransactionForm = ({ isOpen, onClose }) => {
                 onClick={() =>
                   setFormData({ ...formData, type: 'expense', categoryId: '' })
                 }
-                className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-                  formData.type === 'expense'
-                    ? 'bg-red-500 text-white shadow-lg shadow-red-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${formData.type === 'expense'
+                  ? 'bg-red-500 text-white shadow-lg shadow-red-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
               >
                 Pengeluaran
               </button>
@@ -247,37 +270,36 @@ const TransactionForm = ({ isOpen, onClose }) => {
                 onClick={() =>
                   setFormData({ ...formData, type: 'income', categoryId: '' })
                 }
-                className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-                  formData.type === 'income'
-                    ? 'bg-green-500 text-white shadow-lg shadow-green-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${formData.type === 'income'
+                  ? 'bg-green-500 text-white shadow-lg shadow-green-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
               >
                 Pemasukan
               </button>
             </div>
 
             {/* Amount */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Jumlah *
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
-                  Rp
-                </span>
-                <input
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) =>
-                    setFormData({ ...formData, amount: e.target.value })
-                  }
-                  placeholder="0"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg font-medium"
-                  required
-                />
-              </div>
-            </div>
+<div>
+  <label className="block text-sm font-semibold text-gray-700 mb-2">
+    Jumlah *
+  </label>
+  <div className="relative">
+    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+      Rp
+    </span>
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9.]*"
+      value={formData.amount ? formatRupiahInput(formData.amount) : ''}
+      onChange={handleAmountChange}
+      placeholder={formData.type === 'expense' ? '50.000' : '1.000.000'}
+      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg font-medium"
+      required
+    />
+  </div>
+</div>
 
             {/* Custom Category Dropdown */}
             <div ref={dropdownRef}>
@@ -394,7 +416,12 @@ const TransactionForm = ({ isOpen, onClose }) => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Contoh: Makan siang di restoran"
+                onKeyDown={handleKeyDown}
+                placeholder={
+                  formData.type === 'expense'
+                    ? 'Makan siang di restoran'
+                    : 'Gaji bulanan'
+                }
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               />
             </div>
