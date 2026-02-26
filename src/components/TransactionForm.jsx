@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, AlertCircle } from 'lucide-react';
 import useFinanceStore from '../store/useFinanceStore';
 import useAlertStore from '../components/hooks/useAlert';
 import { format } from 'date-fns';
@@ -37,6 +37,8 @@ const TransactionForm = ({ isOpen, onClose }) => {
     date: new Date(),
   });
 
+  const [showZeroWarning, setShowZeroWarning] = useState(false);
+
   // Format Rupiah
   const formatRupiahInput = (value) => {
     const numbers = value.replace(/\D/g, '');
@@ -45,14 +47,34 @@ const TransactionForm = ({ isOpen, onClose }) => {
 
   const handleAmountChange = (e) => {
     const input = e.target.value;
-    const formatted = formatRupiahInput(input);
-    const rawValue = formatted.replace(/\./g, '');
-    setFormData({ ...formData, amount: rawValue });
+
+    // Hapus semua karakter non-digit
+    let numbers = input.replace(/\D/g, '');
+
+    // Cek apakah user ketik 0 di awal
+    if (numbers.startsWith('0') && numbers.length > 0) {
+      setShowZeroWarning(true); // Tampilkan warning
+    } else {
+      setShowZeroWarning(false); // Sembunyikan warning
+    }
+
+    // Hapus leading zeros (0 di depan)
+    numbers = numbers.replace(/^0+/, '');
+
+    // Jika kosong setelah hapus leading zeros, biarkan kosong
+    if (numbers === '') {
+      setFormData({ ...formData, amount: '' });
+      return;
+    }
+
+    // Simpan raw value tanpa titik
+    setFormData({ ...formData, amount: numbers });
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      e.stopPropagation();
       handleSubmit(e);
     }
   };
@@ -60,6 +82,7 @@ const TransactionForm = ({ isOpen, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Validasi field wajib
     if (!formData.amount || !formData.categoryId) {
       showErrorDialog(
         'Data Tidak Lengkap',
@@ -68,9 +91,19 @@ const TransactionForm = ({ isOpen, onClose }) => {
       return;
     }
 
+    // Validasi amount tidak boleh 0
+    const amount = parseFloat(formData.amount);
+    if (amount === 0 || isNaN(amount)) {
+      showErrorDialog(
+        'Jumlah Tidak Valid',
+        'Jumlah transaksi harus lebih dari Rp 0. Mohon masukkan nominal yang valid.'
+      );
+      return;
+    }
+
     addTransaction({
       ...formData,
-      amount: parseFloat(formData.amount),
+      amount: amount,
       date: formData.date.toISOString(),
     });
 
@@ -87,6 +120,8 @@ const TransactionForm = ({ isOpen, onClose }) => {
       description: '',
       date: new Date(),
     });
+
+    setShowZeroWarning(false); // Reset warning
 
     onClose();
   };
@@ -119,11 +154,10 @@ const TransactionForm = ({ isOpen, onClose }) => {
                   onClick={() =>
                     setFormData({ ...formData, type: 'expense', categoryId: '' })
                   }
-                  className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-                    formData.type === 'expense'
+                  className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${formData.type === 'expense'
                       ? 'bg-red-500 text-white shadow-lg shadow-red-200'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   Pengeluaran
                 </button>
@@ -133,11 +167,10 @@ const TransactionForm = ({ isOpen, onClose }) => {
                   onClick={() =>
                     setFormData({ ...formData, type: 'income', categoryId: '' })
                   }
-                  className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-                    formData.type === 'income'
+                  className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${formData.type === 'income'
                       ? 'bg-green-500 text-white shadow-lg shadow-green-200'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   Pemasukan
                 </button>
@@ -163,6 +196,14 @@ const TransactionForm = ({ isOpen, onClose }) => {
                     required
                   />
                 </div>
+
+                {/* Warning Text - Conditional */}
+                {showZeroWarning && (
+                  <div className="mt-2 flex items-start gap-1.5 text-xs text-red-600 animate-in fade-in fade-out duration-200">
+                    <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                    <span>Tidak bisa menambahkan angka 0 terlebih dahulu!</span>
+                  </div>
+                )}
               </div>
 
               {/* Category Select - SHADCN */}

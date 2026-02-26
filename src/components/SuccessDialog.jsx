@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -11,11 +12,40 @@ import {
   import useAlertStore from '../components/hooks/useAlert';
   
   export default function SuccessDialog() {
+
     const { successDialog, closeSuccessDialog } = useAlertStore();
+  
+    // Handle Enter key
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    // Ignore jika Enter dari input/textarea/select
+    if (
+      e.target.tagName === 'INPUT' || 
+      e.target.tagName === 'TEXTAREA' || 
+      e.target.tagName === 'SELECT' ||
+      e.target.getAttribute('role') === 'combobox'
+    ) {
+      return;
+    }
+
+    if (e.key === 'Enter' && successDialog.isOpen) {
+      e.preventDefault();
+      closeSuccessDialog();
+    }
+  };
+
+  if (successDialog.isOpen) {
+    document.addEventListener('keydown', handleKeyDown);
+  }
+
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
+  };
+}, [successDialog.isOpen]); // PERBAIKI: ganti isOpen jadi successDialog.isOpen
   
     return (
       <AlertDialog open={successDialog.isOpen} onOpenChange={closeSuccessDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
             <div className="flex items-center justify-center mb-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">

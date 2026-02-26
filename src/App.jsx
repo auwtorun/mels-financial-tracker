@@ -34,7 +34,7 @@ function App() {
         <div className="flex flex-col gap-4">
           {/* Transaction List */}
           <div className="lg:col-span-1">
-            <TransactionList limit={5} showViewAll={true}/>
+            <TransactionList showViewAll={true}/>
           </div>
 
           {/* Category Chart */}
