@@ -4,6 +4,10 @@ import Dashboard from "./components/Dashboard";
 import TransactionForm from "./components/TransactionForm";
 import TransactionList from "./components/TransactionList";
 import CategoryChart from "./components/CategoryChart";
+import ConfirmDialog from "./components/ConfirmDialog";
+import SuccessDialog from "./components/SuccessDialog";
+import ErrorDialog from "./components/ErrorDialog";
+import AlertContainer from "./components/AlertContainer";
 import { Button } from "./components/ui/button";
 
 function App() {
@@ -21,26 +25,6 @@ function App() {
           </div>
         </div>
       </header>
-      {/*
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-
-        <Dashboard />
-
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          <div className="lg:col-span-1">
-            <CategoryChart />
-          </div>
-
-
-          <div className="lg:col-span-2">
-            <TransactionList />
-          </div>
-        </div>
-      </main>
-
-      */}
 
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Dashboard Cards */}
@@ -48,12 +32,12 @@ function App() {
 
         {/* Grid Layout */}
         <div className="flex flex-col gap-4">
-          {/* Left Column - Chart */}
+          {/* Transaction List */}
           <div className="lg:col-span-1">
             <TransactionList limit={5} showViewAll={true}/>
           </div>
 
-          {/* Right Column - Transaction List */}
+          {/* Category Chart */}
           <div className="lg:col-span-2">
             <CategoryChart />
           </div>
@@ -74,6 +58,12 @@ function App() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
       />
+
+      {/* Global Dialogs & Alerts */}
+      <ConfirmDialog />
+      <SuccessDialog />
+      <ErrorDialog />
+      <AlertContainer />
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-12 absolute w-full">

@@ -2,11 +2,13 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, ArrowUpCircle, ArrowDownCircle, ArrowRight } from 'lucide-react';
 import useFinanceStore from '../store/useFinanceStore';
+import useConfirmStore from '../components/hooks/useConfirm';
 import { formatCurrency, formatDate, groupTransactionsByDate } from '../utils/helpers';
 
 const TransactionList = ({ limit, showViewAll = false }) => {
   const navigate = useNavigate();
   const { transactions, categories, deleteTransaction } = useFinanceStore();
+  const { openConfirm } = useConfirmStore();
 
   // Sort transactions by date (terbaru di atas) sebelum grouping
   const sortedTransactions = useMemo(() => {
@@ -31,9 +33,11 @@ const TransactionList = ({ limit, showViewAll = false }) => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Yakin ingin menghapus transaksi ini?')) {
-      deleteTransaction(id);
-    }
+    openConfirm(
+      'Hapus Transaksi',
+      'Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.',
+      () => deleteTransaction(id)
+    );
   };
 
   if (transactions.length === 0) {
